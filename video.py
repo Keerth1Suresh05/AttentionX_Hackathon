@@ -6,7 +6,6 @@ def crop_vertical(input_path, output_path, start, end):
     try:
         subclip = clip.subclip(start, end)
 
-        # 9:16 crop (Reels/TikTok format)
         new_width = int(subclip.h * 9 / 16)
 
         cropped = subclip.crop(
