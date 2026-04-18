@@ -11,7 +11,6 @@ from backend.utils.video import crop_vertical
 
 app = FastAPI()
 
-# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -33,18 +32,18 @@ app.mount("/outputs", StaticFiles(directory=str(OUTPUT_DIR)), name="outputs")
 @app.post("/upload")
 async def upload_video(file: UploadFile = File(...)):
     try:
-        print("🚀 Upload started")
+        print(" Upload started")
 
         file_path = UPLOAD_DIR / file.filename
 
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-        print("✅ File saved")
+        print(" File saved")
 
         print("🎙 Transcribing...")
         transcript = transcribe_video(str(file_path))
-        print("✅ Transcription done")
+        print(" Transcription done")
 
         if not transcript.get("segments"):
             return {"error": "No speech detected"}
@@ -52,14 +51,14 @@ async def upload_video(file: UploadFile = File(...)):
         segment = transcript["segments"][0]
         start, end = segment["start"], segment["end"]
 
-        print("🎬 Processing video...")
+        print("Processing video...")
 
         output_filename = f"clip_{file.filename}"
         output_path = OUTPUT_DIR / output_filename
 
         crop_vertical(str(file_path), str(output_path), start, end)
 
-        print("✅ Video ready")
+        print(" Video ready")
 
         return {
             "message": "Processed successfully",
@@ -68,5 +67,5 @@ async def upload_video(file: UploadFile = File(...)):
         }
 
     except Exception as e:
-        print("❌ ERROR:", str(e))
+        print(" ERROR:", str(e))
         return {"error": str(e)}
